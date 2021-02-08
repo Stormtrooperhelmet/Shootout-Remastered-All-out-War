@@ -1,0 +1,231 @@
+--player vars
+local plr = game.Players.LocalPlayer
+local char = plr.Character
+local mouse = plr:GetMouse()
+local cam = workspace.CurrentCamera
+local uis = game:GetService("UserInputService")
+local plrui = plr:WaitForChild("PlayerGui")
+local ui = plrui:WaitForChild("MainUI")
+--services
+local runs = game:GetService("RunService")
+local rs = game:GetService("ReplicatedStorage")
+local ts = game:GetService("TweenService")
+local coreui = game:GetService("CoreGui")
+--folders
+local models = rs:WaitForChild("models")
+local servermodels = rs:WaitForChild("servermodels")
+local resources = rs:WaitForChild("resources")
+local ignorelist = workspace.ignore
+--other
+local primary = "M4"
+local secondary = nil
+local equipment1 = nil
+local equipment2 = nil
+--stuff
+local weaponequipped
+local weaponmodule
+local weaponui
+local larm
+local rarm
+--bools
+local aiming = false
+local shooting = false
+local mouse1down = false
+local reloading = false
+local checking = false
+--cframes
+local maincf = CFrame.new()
+local aimcf = CFrame.new()
+local recoilcf = CFrame.new()
+local swaycf = CFrame.new()
+--other cfs
+local mag
+--local bolt
+local magcf = CFrame.new()
+local boltcf = CFrame.new()
+--arms
+local larmcf = CFrame.new()
+local rarmcf = CFrame.new()
+
+uis.MouseIconEnabled = false
+plr.CameraMode = Enum.CameraMode.LockFirstPerson
+
+runs.RenderStepped:Connect(function()
+	mouse.TargetFilter = cam
+	
+	if weaponequipped and larm and rarm then
+		weaponequipped:SetPrimaryPartCFrame(
+			cam.CFrame
+				* maincf
+				* aimcf
+				* recoilcf
+				* swaycf
+		)
+		
+		larm:SetPrimaryPartCFrame(
+			weaponequipped.Handle.CFrame
+				* larmcf
+		)
+		
+		rarm:SetPrimaryPartCFrame(
+			weaponequipped.Handle.CFrame
+				* rarmcf
+		)
+		
+		mag.CFrame = (
+			mag.CFrame
+				--* weaponequipped.Handle.CFrame
+				* magcf
+		)
+		
+		if aiming then
+			aimcf = aimcf:lerp(weaponmodule.AimCF, weaponmodule.AimSpeed)
+		else
+			aimcf = aimcf:lerp(CFrame.new(), weaponmodule.AimSpeed)
+		end
+		recoilcf = recoilcf:lerp(CFrame.new(), 0.1)
+		larmcf = larmcf:lerp(weaponmodule.LArmCF, 0.1)
+		rarmcf = rarmcf:lerp(weaponmodule.RArmCF, 0.1)
+		magcf = magcf:lerp(weaponmodule.MagCF, 0.1)
+		maincf = maincf:lerp(weaponmodule.MainCF, 0.1)
+		swaycf = swaycf:lerp(CFrame.new(), 0.05)
+		--
+		weaponui.MainFrame:WaitForChild("magCount").Text = "+"..tostring(weaponmodule.StoredMags)
+		if weaponmodule.CurrentMag == 0 then
+			weaponui.MainFrame:WaitForChild("magCondition").Text = "EMPTY"
+			weaponui.MainFrame:WaitForChild("magCondition").TextColor3 = Color3.new(1, 0, 0.0156863)
+			weaponui.MainFrame:WaitForChild("mag").ImageColor3 = Color3.new(1, 0, 0.0156863)
+		else
+			weaponui.MainFrame:WaitForChild("magCondition").Text = "MAG"
+			weaponui.MainFrame:WaitForChild("magCondition").TextColor3 = Color3.new(1, 1, 1)
+			weaponui.MainFrame:WaitForChild("mag").ImageColor3 = Color3.new(1, 1, 1)
+		end
+		--ui
+		weaponui.MainFrame:WaitForChild("mag").ammo.Size = UDim2.fromScale(1,weaponmodule.CurrentMag/weaponmodule.MagSize)
+		weaponui.MainFrame:WaitForChild("firemode").Text = weaponmodule.FireMode
+	end
+end)
+
+function reload()
+	if not reloading and weaponmodule.StoredMags > 0 then
+		if weaponmodule.CurrentMag > 0 then
+		weaponmodule.Reload()
+	else
+		weaponmodule.EmptyReload()
+		end
+	end
+end
+
+function check()
+	if not checking then
+		weaponmodule.Check()
+	end
+end
+
+function changeFiremode()
+	if weaponmodule.CanChangeFireModes == true then
+		
+	end
+end
+
+function fire()
+	weaponmodule.CurrentMag = weaponmodule.CurrentMag - 1
+	recoilcf = recoilcf:lerp(weaponmodule.WeaponKick, 0.8)
+	--casting
+	local origin = weaponequipped.Handle.Muzzle.WorldPosition
+	local direction = (mouse.Hit.Position - origin).Unit
+	resources.fire:FireServer(origin, direction, weaponmodule.BulletSpeed)
+end
+
+function equip(weapon)
+	weaponequipped = models:WaitForChild(weapon):Clone()
+	weaponequipped.Parent = cam	
+	mag = weaponequipped:WaitForChild("Mag")
+	weaponmodule = require(weaponequipped.Settings)
+	resources.equip:FireServer(ignorelist)
+	weaponui = plr.PlayerGui.MainUI
+	--
+	maincf = weaponmodule.MainCF
+	larmcf = weaponmodule.LArmCF
+	rarmcf = weaponmodule.RArmCF
+	--
+	larm = rs:WaitForChild("LeftArm"):Clone()
+	larm.Parent = cam
+	--
+	rarm = rs:WaitForChild("RightArm"):Clone()
+	rarm.Parent = cam
+	--
+	resources.test:FireServer(weaponequipped, larm, rarm)
+	print("framework all set up")
+end
+
+function unequip()
+	weaponequipped:Destroy()
+	larm:Destroy()
+	rarm:Destroy()
+end
+
+--[[function weld(setting, part0, part1)
+	if setting == "create" then
+		local weld = Instance.new("Weld", part0)
+		weld.Part0 = part0
+		weld.Part1 = part1
+		part1.Anchored = false
+	elseif setting == "destroy" then
+		part0:FindFirstChildOfClass("Weld"):Destroy()
+	end
+end]]
+
+mouse.Button1Down:Connect(function()
+	if weaponmodule.CurrentMag > 0 then
+		fire()
+	end
+end)
+
+mouse.Button2Down:Connect(function()
+	aiming = true
+end)
+
+mouse.Button2Up:Connect(function()
+	aiming = false
+end)
+
+uis.InputBegan:Connect(function(input, gameprocessed)		
+	if input.KeyCode == Enum.KeyCode.R then
+		reload()
+	elseif input.KeyCode == Enum.KeyCode.M then
+		check()
+	elseif input.KeyCode == Enum.KeyCode.V then
+		
+	end
+end)
+
+uis.InputChanged:Connect(function(input)
+	local output = input.Delta / 1
+	swaycf = swaycf:lerp(CFrame.new(math.rad(output.X), math.rad(output.Y), 0), 0.05 )
+end)
+
+equip(primary)
+
+char.Humanoid.Died:Connect(unequip)
+
+--[[--Last time the button was pressed
+local lastTime = tick()
+
+Input.InputBegan:connect(function(KeyInput)
+    --Check the keycode
+    if KeyInput.KeyCode == Enum.KeyCode.W then
+        --Get tick() time
+        local now = tick()
+        --compare tick()'s
+        local difference = (now - lastTime)
+        --Check if difference is less than a second
+        if difference <= 1 then
+            --if so, enable double jump
+            Character.Torso.Velocity = Vector3.new(0, 60, 0)
+        else
+            --Otherwise, normal jump.
+                Character.Humanoid.Jump = true
+        end
+    end
+end)]]
