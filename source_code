@@ -1,4 +1,3 @@
-# Synced at: 2021/02/08
 --player vars
 local plr = game.Players.LocalPlayer
 local char = plr.Character
