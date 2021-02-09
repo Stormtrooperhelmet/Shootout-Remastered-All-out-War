@@ -1,4 +1,4 @@
-# Shootout Remastered
+# Shootout: _Remastered_
 Advanced FPS inside of roblox.
 After almost three years, I finally learned to make FPS games inside of roblox.
 It will be my first ever FPS game launch and its gonna be a system made by me.
