@@ -24,5 +24,10 @@ It will be my first ever FPS game launch and its gonna be a system made by me.
 
 ### 4. To Do
 ```markdown
-- hello
+- Fix mag checking
+✔ Reloading
+- Running
+✔ Shooting
+✔ Shooting sounds
+- Crouching
 ```
