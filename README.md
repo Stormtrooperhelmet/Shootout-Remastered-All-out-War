@@ -22,7 +22,7 @@ It will be my first ever FPS game launch and its gonna be a system made by me.
 ### 3. Progress
 - [Trello board](https://trello.com/b/mRVDuOby/advanced-fps)
 - [Framework](https://github.com/Stormtrooperhelmet/framework/blob/framework/framework.md)
-- [Update Log](https://github.com/Stormtrooperhelmet/Shootout-Remastered-All-out-War/blob/ea855bcaef5ef2dbbf8f4c8a5589cfc9544deb3a/README.md)
+- [Update Log](https://github.com/Stormtrooperhelmet/Shootout-Remastered-All-out-War/blob/updates/README.md)
 
 ### 4. To Do
 ```markdown
