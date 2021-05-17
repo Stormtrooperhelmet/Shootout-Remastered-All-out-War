@@ -1,4 +1,4 @@
-# Shootout _Remastered_
+# Shootout Remastered: All out War
 Advanced FPS inside of roblox.
 After almost three years, I finally learned to make FPS games inside of roblox.
 It will be my first ever FPS game launch and its gonna be a system made by me.
@@ -11,6 +11,7 @@ It will be my first ever FPS game launch and its gonna be a system made by me.
 - Two teams
 - Different gamemodes
 - No health ui
+- Stamina
 
 ### 2. Workflow
 - Framework
@@ -26,7 +27,7 @@ It will be my first ever FPS game launch and its gonna be a system made by me.
 ```markdown
 - Fix mag checking
 ✔ Reloading
-- Running
+✔ Running
 ✔ Shooting
 ✔ Shooting sounds
 - Crouching
